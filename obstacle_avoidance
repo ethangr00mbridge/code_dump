@@ -1,0 +1,52 @@
+from sensors import setServoAngle, sweep
+from movement import move, rotate
+import random
+
+while True:
+    sect1, sect2, sect3 = sweep()
+    mindist = 200
+
+    obstacle_state = 0
+
+    if (sect1 and sect2 and sect3) > mindist:                   # no obstacle in any sector
+        pwm = PWM(Pin(15))
+        pwm.freq(50)
+        move(10, 1)
+        obstacle_state = 1
+
+    elif (sect1 <= mindist) and ((sect2 and sect3) > mindist):  # obstacle on left only
+        # reverse and turn right then go forward
+        move(10, 0)
+        rotate(45, 1)
+        obstacle_state = 2
+    elif (sect2 <= mindist) and ((sect1 and sect3) > mindist):  # obstacle in front only
+        # reverse and turn right or left then go forward
+        move(10, 0)
+        rotate(45, random.randint(0, 1))
+        obstacle_state = 3
+    elif (sect3 <= mindist) and ((sect2 and sect1) > mindist):  # obstacle on right only
+        # reverse and turn left then go forward
+        move(10, 0)
+        rotate(45, 0)
+        obstacle_state = 4
+    elif (sect1 > mindist) and ((sect2 and sect3) <= mindist):  # obstacle in front and left
+        # reverse and turn far right then go forward
+        move(15, 0)
+        rotate(60, 1)
+        obstacle_state = 5
+    elif (sect3 > mindist) and ((sect2 and sect1) <= mindist):  # obstacle in front and right
+        # reverse and turn far left then go forward
+        move(15, 0)
+        rotate(60, 0)
+        obstacle_state = 6
+    elif (sect2 > mindist) and ((sect3 and sect1) <= mindist):  # obstacle on left and right
+        # go forward
+        move(10, 1)
+        obstacle_state = 7
+    elif (sect1 and sect2 and sect3) <= mindist:                # obstacle in all sectors
+        # reverse then turn 90 degrees to either direction
+        move(20, 0)
+        rotate(90, random.randint(0, 1))
+        obstacle_state = 8
+    else:                                                       # error
+        obstacle_state = 0
