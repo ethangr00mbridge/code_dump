@@ -1,0 +1,57 @@
+from encoder import Encoder
+from motor import Motor
+
+
+def move(distance_mm, direction):
+    motor_left = Motor("left", 8, 9, 6)
+    motor_right = Motor("right", 10, 11, 7)
+    ENC_L = 18
+    ENC_R = 19
+    enc = Encoder(ENC_L, ENC_R)
+    enc.clear_count()
+    hundredmm = 20.2
+    speed = 50
+
+    while (enc.get_left() + enc.get_right()) / 2 <= (hundredmm * distance_mm) / 100:
+        if direction == 1:  # forwards
+            motor_left.set_forwards()
+            motor_right.set_forwards()
+
+            motor_left.duty(speed)
+            motor_right.duty(speed)
+
+        if direction == 0:  # backwards
+            motor_left.set_backwards()
+            motor_right.set_backwards()
+
+            motor_left.duty(speed)
+            motor_right.duty(speed)
+    motor_left.duty(0)
+    motor_right.duty(0)
+    
+def rotate(degrees, direction):
+    motor_left = Motor("left", 8, 9, 6)
+    motor_right = Motor("right", 10, 11, 7)
+    ENC_L = 18
+    ENC_R = 19
+    enc = Encoder(ENC_L, ENC_R)
+    enc.clear_count()
+    fullrot = 57.5
+    speed = 50
+
+    while (enc.get_left() + enc.get_right()) / 2 <= (degrees * fullrot) / 360:
+        if direction == 1:  # clockwise
+            motor_left.set_forwards()
+            motor_right.set_backwards()
+
+            motor_left.duty(speed)
+            motor_right.duty(speed)
+
+        if direction == 0:  # anticlockwise
+            motor_left.set_backwards()
+            motor_right.set_forwards()
+
+            motor_left.duty(speed)
+            motor_right.duty(speed)
+    motor_left.duty(0)
+    motor_right.duty(0)
