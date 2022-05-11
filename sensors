@@ -1,0 +1,64 @@
+pwm = PWM(Pin(15))
+pwm.freq(50)
+
+def setServoAngle(angle):
+    position = int(8000 * (angle / 180) + 1000)
+    pwm.duty_u16(position)
+
+
+
+
+def sweep():
+    if 'count' in locals():
+        count = count
+    else:
+        count = 2
+    TRIG = 3
+    ECH0 = 2
+    ultrasonic_sensor = sonic(TRIG, ECH0)
+    dist = 0
+    sector1 = 0
+    sector1_avg = 0
+    sector2 = 0
+    sector2_avg = 0
+    sector3 = 0
+    sector3_avg = 0
+    if (count % 2) == 0:
+        for pos in range(0, 70, 10):
+            setServoAngle(pos)
+            time.sleep(0.05)
+            dist = ultrasonic_sensor.distance_mm()
+            sector1 = sector1 + dist
+        for pos in range(60, 130, 10):
+            setServoAngle(pos)
+            time.sleep(0.05)
+            dist = ultrasonic_sensor.distance_mm()
+            sector2 = sector2 + dist
+        for pos in range(120, 190, 10):
+            setServoAngle(pos)
+            time.sleep(0.05)
+            dist = ultrasonic_sensor.distance_mm()
+            sector3 = sector3 + dist
+
+    else:
+        for pos in range(180, 110, -10):
+            setServoAngle(pos)
+            time.sleep(0.05)
+            dist = ultrasonic_sensor.distance_mm()
+            sector3 = sector3 + dist
+        for pos in range(120, 50, -10):
+            setServoAngle(pos)
+            time.sleep(0.05)
+            dist = ultrasonic_sensor.distance_mm()
+            sector2 = sector2 + dist
+        for pos in range(60, -10, -10):
+            setServoAngle(pos)
+            time.sleep(0.05)
+            dist = ultrasonic_sensor.distance_mm()
+            sector1 = sector1 + dist
+    sector1_avg = sector1 / 7
+    sector2_avg = sector2 / 7
+    sector3_avg = sector3 / 7
+    count = count + 1
+
+    return sector1_avg, sector2_avg, sector3_avg
